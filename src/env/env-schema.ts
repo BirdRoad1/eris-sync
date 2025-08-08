@@ -7,5 +7,7 @@ export const envSchema = z.object({
     .transform(z => Number(z))
     .refine(n => n >= 0 && n <= 65535, { error: 'Invalid port number' }),
   NODE_ENV: z.enum(['development', 'production']).default('development'),
-  DATABASE_URL: z.string()
+  DATABASE_URL: z.string(),
+  ADMIN_TOKEN: z.string().nonempty(),
+  JWT_PRIVATE_KEY: z.string()
 });

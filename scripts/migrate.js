@@ -66,6 +66,18 @@ if (process.argv.length === 3) {
     await fs.openSync(migrationFile, 'wx');
 
     console.log(`Migration created at ${path.resolve(migrationFile)}`);
+  } else if (cmd === 'reset') {
+    const response = await rl.question(
+      'Are you sure you want to reset the database? '
+    );
+
+    if (['y', 'yes'].includes(response.toLowerCase())) {
+      await db.query(
+        `DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;`
+      );
+      console.log('Schema dropped successfully!');
+    }
   } else {
     console.log('Invalid command');
   }
@@ -109,7 +121,7 @@ for (const migration of migrations) {
     console.log(`Executing migration ${fullPath}`);
     const sql = fs.readFileSync(fullPath, 'utf-8');
     if (sql.length === 0) {
-      console.log("Warning: skipped empty migration: " + fullPath);
+      console.log('Warning: skipped empty migration: ' + fullPath);
       continue;
     }
 

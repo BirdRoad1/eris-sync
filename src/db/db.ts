@@ -1,3 +1,4 @@
 import { Client } from 'pg';
-export const db = new Client();
+import { env } from '../env/env';
+export const db = new Client(env.DATABASE_URL);
 await db.connect();
