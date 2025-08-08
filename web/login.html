@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Eris Sync</title>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body>
+    <div class="content">
+      <h1 class="title">Login</h1>
+      <form class="login-form" id="login-form">
+        <div class="input">
+          <p>Admin token</p>
+          <input type="text" id="admin-input" />
+        </div>
+        <button class="submit-btn" type="submit">Login</button>
+        <div class="error-container" id="error-container">
+          <p>Invalid username/password</p>
+        </div>
+      </form>
+      <script type="module" src="/js/login.js"></script>
+    </div>
+  </body>
+</html>

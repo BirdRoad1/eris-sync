@@ -1,0 +1,1 @@
+ALTER TABLE client ADD device_model TEXT;

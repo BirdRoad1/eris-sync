@@ -1,0 +1,1 @@
+ALTER TABLE client ALTER COLUMN last_seen DROP DEFAULT;

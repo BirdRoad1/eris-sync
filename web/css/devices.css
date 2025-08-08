@@ -1,0 +1,70 @@
+.devices {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.device {
+  display: flex;
+  height: 160px;
+  flex-shrink: 0;
+  flex-direction: column;
+  background-color: rgb(30, 30, 30);
+  border-radius: 3px;
+  padding: 15px;
+  gap: 10px;
+}
+
+.device-name {
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  width: 400px;
+  gap: 10px;
+  height: 40px;
+}
+
+.buttons > button {
+  flex: 1;
+  cursor: pointer;
+}
+
+.reset-token-btn {
+  background-color: rgb(49, 49, 49);
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.remove-btn {
+  background-color: rgb(104, 9, 9);
+  color: white;
+  border-radius: 4px;
+  border: none;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title > button {
+  padding: 5px 10px;
+  background-color: rgb(21, 81, 153);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.no-devices {
+  display: none;
+  text-align: center;
+}
+
+.no-devices.visible {
+  display: inline-block;
+}

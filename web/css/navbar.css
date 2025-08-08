@@ -1,0 +1,30 @@
+
+.navbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background-color: rgb(16, 16, 16);
+  width: 100%;
+  justify-content: center;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: white;
+}
+
+.navbar-left {
+  position: absolute;
+  left: 0;
+}
+
+.navbar-right {
+  position: absolute;
+  right: 0;
+}
+
+.navbar-center {
+  display: flex;
+  gap: 30px;
+}

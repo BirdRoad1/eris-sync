@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel | Eris Sync</title>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/panel.css" />
+    <link rel="stylesheet" href="/css/navbar.css" />
+    <link rel="stylesheet" href="/css/devices.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <p class="navbar-left">Eris Sync</p>
+      <div class="navbar-center">
+        <a href="/panel">Devices</a>
+        <a href="/panel/songs">Songs</a>
+        <a href="/panel/settings">Settings</a>
+      </div>
+      <div class="navbar-right">
+        <a href="#" id="logout-btn">Log Out</a>
+      </div>
+    </div>
+    <div class="content">
+      <div class="section-title">
+        <h2>Devices</h2>
+        <button id="new-device-btn">Create</button>
+      </div>
+      <div class="devices" id="devices">
+        <p class="no-devices" id="no-devices">No devices available</p>
+      </div>
+    </div>
+    <script type="module" src="/js/panel.js"></script>
+  </body>
+</html>
