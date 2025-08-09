@@ -117,4 +117,59 @@ export class API {
       throw new Error(json.error);
     }
   }
+
+  static async getSongs() {
+    const res = await this.request('/api/v1/songs', {
+      method: 'GET'
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error);
+    }
+  }
+
+  static async createSong(title) {
+    const res = await this.request('/api/v1/songs', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        title
+      })
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error);
+    }
+
+    return json.id;
+  }
+
+  /**
+   *
+   * @param {number} songId
+   * @param {File} file
+   * @returns
+   */
+  static async uploadMedia(songId, file) {
+    const res = await this.request(`/api/v1/songs/${songId}/media`, {
+      method: 'POST',
+      headers: {
+        'content-type': file.type || 'application/octet-stream',
+        'file-name': file.name
+      },
+      body: file,
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error);
+    }
+  }
 }

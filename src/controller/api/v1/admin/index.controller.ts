@@ -24,9 +24,10 @@ const authenticate: RequestHandler = async (req, res) => {
     {
       role: 'admin'
     },
-    env.JWT_PRIVATE_KEY,
+    env.JWT_ECDSA_PRIVATE_KEY,
     {
-      expiresIn: '1 day'
+      expiresIn: '1 day',
+      algorithm: 'ES256'
     }
   );
 
@@ -42,7 +43,9 @@ const validateAuth: RequestHandler = (req, res, next) => {
   }
 
   const token = authorization.substring(7);
-  const data = jwt.verify(token, env.JWT_PRIVATE_KEY);
+  const data = jwt.verify(token, env.JWT_ECDSA_PUBLIC_KEY, {
+    algorithms: ['ES256']
+  });
   if (typeof data === 'object' && data['role'] === 'admin') {
     next();
   } else {
