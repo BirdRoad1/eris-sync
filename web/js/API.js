@@ -128,6 +128,8 @@ export class API {
     if (!res.ok) {
       throw new Error(json.error);
     }
+
+    return json.result;
   }
 
   static async createSong(title) {
@@ -148,6 +150,18 @@ export class API {
     }
 
     return json.id;
+  }
+
+  static async deleteSong(id) {
+    const res = await this.request(`/api/v1/songs/${id}`, {
+      method: 'DELETE'
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error);
+    }
   }
 
   /**

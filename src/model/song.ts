@@ -1,4 +1,5 @@
 import { db } from '../db/db';
+import { queries } from '../db/queries';
 
 export class Song {
   static async create(
@@ -11,7 +12,7 @@ export class Song {
     track_number?: string
   ): Promise<number> {
     return (await db.query(
-      'INSERT INTO song (title, cover_path, release_year, duration_seconds, lyrics_url, genre, track_number) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      queries.INSERT_SONG,
       [
         title,
         cover_path ?? null,
@@ -25,14 +26,19 @@ export class Song {
   }
 
   static async delete(id: number) {
-    return (await db.query('DELETE FROM song WHERE id=$1 RETURNING id', [id]))
+    return (await db.query(queries.DELETE_SONG, [id]))
       .rowCount;
   }
 
   static async getAll() {
+    console.log( (
+      await db.query(
+        queries.SELECT_ALL_SONGS
+      )
+    ).rows)
     return (
       await db.query(
-        'SELECT id,title,album_id,cover_path,release_year,duration_seconds,lyrics_url,genre,track_number FROM song'
+        queries.SELECT_ALL_SONGS
       )
     ).rows;
   }
@@ -41,7 +47,7 @@ export class Song {
     return (
       (
         await db.query(
-          'SELECT id,title,album_id,cover_path,release_year,duration_seconds,lyrics_url,genre,track_number FROM song WHERE id=$1',
+          queries.SELECT_SONG_BY_ID,
           [id]
         )
       ).rows[0] ?? null

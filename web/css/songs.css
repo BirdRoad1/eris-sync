@@ -15,10 +15,6 @@
   gap: 10px;
 }
 
-.song-name {
-  font-weight: bold;
-}
-
 .buttons {
   display: flex;
   width: 400px;
@@ -191,4 +187,8 @@ label[for='upload'] {
   border-radius: 3px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.song-title {
+  font-weight: bold;
 }

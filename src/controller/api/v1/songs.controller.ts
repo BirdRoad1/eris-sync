@@ -1,12 +1,14 @@
 import { RequestHandler } from 'express';
 import { Song } from '../../../model/song';
 import { CreateSongSchema } from '../../../schema/songs-schema';
-import fs from 'fs';
 import { pipeline } from 'stream/promises';
 import {
   StreamByteLimitExceededError,
   StreamByteLimitTransform
 } from '../../../streams/stream-byte-limit-transform';
+import { ContentDelivery } from '../../../cdn/content-delivery';
+import { SongMedia } from '../../../model/song-media';
+import { clientQuerySchema } from '../../../schema/admin-schema';
 
 const getSongs: RequestHandler = async (req, res) => {
   res.json({
@@ -25,9 +27,32 @@ const postSongs: RequestHandler = async (req, res) => {
   res.json({ id });
 };
 
+const deleteSong: RequestHandler = async (req, res) => {
+  const parsed = clientQuerySchema.safeParse(req.params); // TODO: rename schema for better reuse
+
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Invalid id' });
+    return;
+  }
+
+  const deleted = await Song.delete(parsed.data.id);
+  if (deleted !== null && deleted > 0) {
+    res.status(200).json({});
+  } else {
+    res.status(404).json({ error: 'Song not found' });
+  }
+};
+
 const postMedia: RequestHandler = async (req, res) => {
-  const name = req.get('file-name');
-  if (!name) {
+  const parsed = clientQuerySchema.safeParse(req.params); // TODO: rename schema for better reuse
+
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Invalid id' });
+    return;
+  }
+
+  const fileName = req.get('file-name');
+  if (!fileName) {
     return res.status(400).json({ error: 'Missing file name' });
   }
 
@@ -47,19 +72,22 @@ const postMedia: RequestHandler = async (req, res) => {
     return res.status(400).json({ error: 'File too large!' });
   }
 
-  console.log(req.headers);
-
-  const writeStream = fs.createWriteStream('test.txt');
-
-  // TODO: real file uploading!
+  const writeStream = await ContentDelivery.createObjectWriteStream(fileName);
 
   try {
-    await pipeline(req, new StreamByteLimitTransform(1), writeStream);
-    res.json({});
+    await pipeline(
+      req,
+      new StreamByteLimitTransform(200 * 1e6),
+      writeStream.stream
+    );
+
+    res.json({
+      id: await SongMedia.create('', writeStream.path, parsed.data.id)
+    });
   } catch (err) {
     console.log('Upload error:', err);
-    writeStream.close();
-    fs.rmSync('test.txt');
+    writeStream.stream.close();
+    await ContentDelivery.deleteObject(writeStream.uuid);
 
     if (err instanceof StreamByteLimitExceededError) {
       res.status(400).json({ error: 'File too large' });
@@ -71,4 +99,4 @@ const postMedia: RequestHandler = async (req, res) => {
   }
 };
 
-export const songsController = { getSongs, postSongs, postMedia };
+export const songsController = { getSongs, postSongs, deleteSong, postMedia };
