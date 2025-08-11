@@ -64,6 +64,7 @@ export class ContentDelivery {
       uuid,
       fileName: outFileName,
       path: absPath,
+      relativePath: `./${uuid}/${fileName}`,
       stream: await fsOld.createWriteStream(absPath)
     };
   }
@@ -103,5 +104,25 @@ export class ContentDelivery {
       throw new Error('Tried to delete external file:' + dir);
     await fs.rm(path.join(dir, files[0]));
     await fs.rmdir(dir);
+  }
+
+  static fileToUrl(file: string) {
+    if (path.isAbsolute(file)) {
+      throw new Error('cannot convert absolute path to url');
+    }
+
+    // TODO: regex check file path?
+    const absPath = path.join(env.STORAGE_PATH, file);
+    if (!this.secureTestPath(absPath)) {
+      throw new Error('Tried to convert external path to url:' + absPath);
+    }
+
+    // TODO: make this path configurable
+    return (
+      env.BASE_URL + '/api/v1/storage/' +
+      path
+        .relative(path.resolve(env.STORAGE_PATH), absPath)
+        .replace(/^[.]*/g, '')
+    );
   }
 }

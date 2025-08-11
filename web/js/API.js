@@ -59,7 +59,7 @@ export class API {
       throw new Error(json.error);
     }
 
-    return json.result;
+    return json.results;
   }
 
   static async createDevice(name) {
@@ -129,7 +129,7 @@ export class API {
       throw new Error(json.error);
     }
 
-    return json.result;
+    return json.results;
   }
 
   static async createSong(title) {
@@ -172,6 +172,29 @@ export class API {
    */
   static async uploadMedia(songId, file) {
     const res = await this.request(`/api/v1/songs/${songId}/media`, {
+      method: 'POST',
+      headers: {
+        'content-type': file.type || 'application/octet-stream',
+        'file-name': file.name
+      },
+      body: file,
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error);
+    }
+  }
+
+    /**
+   *
+   * @param {number} songId
+   * @param {File} file
+   * @returns
+   */
+  static async uploadCover(songId, file) {
+    const res = await this.request(`/api/v1/songs/${songId}/cover`, {
       method: 'POST',
       headers: {
         'content-type': file.type || 'application/octet-stream',

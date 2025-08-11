@@ -60,6 +60,10 @@ function createDeviceElement(device) {
   copyTokenBtn.addEventListener('click', () => {
     API.getClientToken(device.id)
       .then(token => {
+        if (!navigator.clipboard) {
+          alert(token);
+          return;
+        }
         navigator.clipboard.writeText(token);
         copyTokenBtn.textContent = 'Copied!';
         setTimeout(() => {
@@ -107,8 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (clients.length === 0) {
       noDevicesText.classList.add('visible');
     }
-
-    console.log(clients);
   } catch (err) {
     alert('Failed to get clients: ' + err.message);
   }

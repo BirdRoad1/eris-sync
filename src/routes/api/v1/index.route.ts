@@ -16,16 +16,19 @@ function getVersion() {
   }
 }
 
-apiRouterV1.use('/', (req, res) => {
+apiRouterV1.get('/', (req, res) => {
   res.json({
     server: 'eris-sync',
     version: getVersion()
   });
 });
 
+
 apiRouterV1.use('/admin', adminRouter);
 
 apiRouterV1.use(apiController.authenticate);
+
+apiRouterV1.use('/me', apiController.getMe);
 
 apiRouterV1.use('/songs', songsRouter);
 

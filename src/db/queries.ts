@@ -9,14 +9,17 @@ export const queries = {
   UPDATE_CLIENT_TOKEN: 'UPDATE client SET private_token=$1 WHERE id=$2',
   INSERT_SONG_MEDIA:
     'INSERT INTO song_media (mime_type, file_path, song_id) VALUES ($1, $2, $3) RETURNING id',
+  SELECT_SONG_MEDIA_BY_SONG:
+    'SELECT id,mime_type,file_path FROM song_media WHERE song_id=$1',
   INSERT_ALBUM:
     'INSERT INTO album (name, cover_path, genre, release_year) VALUES ($1, $2, $3, $4)',
   INSERT_SONG:
     'INSERT INTO song (title, cover_path, release_year, duration_seconds, lyrics_url, genre, track_number) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
   DELETE_SONG: 'DELETE FROM song WHERE id=$1 RETURNING id',
-  SELECT_ALL_SONGS: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number, COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_ath
+  SELECT_ALL_SONGS: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number, COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_path, artist.name as artist_name
         FROM song s
-        LEFT JOIN (
+        LEFT JOIN 
+          (
             SELECT song_id,COUNT(*) as media_count
             FROM song_media
             GROUP BY song_id
@@ -24,7 +27,22 @@ export const queries = {
           ON s.id = m.song_id
         LEFT JOIN
           album AS a
-          ON s.album_id = a.id;`,
-  SELECT_SONG_BY_ID:
-    'SELECT id,title,album_id,cover_path,release_year,duration_seconds,lyrics_url,genre,track_number FROM song WHERE id=$1'
+          ON s.album_id = a.id
+        LEFT JOIN
+          artist AS artist
+          ON s.artist_id = artist.id;`,
+  SELECT_SONG_BY_ID: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number,COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_path
+  FROM song s
+  LEFT JOIN 
+      (
+        SELECT song_id,COUNT(*) as media_count
+        FROM song_media
+        GROUP BY song_id
+      ) m
+      ON m.song_id = s.id
+    LEFT JOIN
+      album AS a
+      ON a.id = s.album_id
+    WHERE s.id = $1;`,
+  UPDATE_SONG_COVER: 'UPDATE song SET cover_path=$2 WHERE id=$1'
 };

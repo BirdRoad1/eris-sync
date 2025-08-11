@@ -7,32 +7,44 @@ function createSongElement(song) {
   const songDiv = document.createElement('div');
   songDiv.classList.add('song');
 
+  const img = document.createElement('img');
+  img.classList.add('song-cover');
+
+  API.request(song.cover_url)
+    .then(res => res.blob())
+    .then(blob => (img.src = URL.createObjectURL(blob)));
+  songDiv.appendChild(img);
+
+  const songRight = document.createElement('div');
+  songRight.classList.add('song-right');
+  songDiv.appendChild(songRight);
+
   const pTitle = document.createElement('p');
   pTitle.textContent = song.title;
   pTitle.classList.add('song-title');
-  songDiv.appendChild(pTitle);
+  songRight.appendChild(pTitle);
 
   const album = document.createElement('p');
   album.textContent =
     song.album_name !== null ? 'Album: ' + song.album_name : 'Single';
   album.classList.add('song-album');
-  songDiv.appendChild(album);
+  songRight.appendChild(album);
 
   if (song.release_year !== null) {
     const released = document.createElement('p');
     released.textContent = `Released: ${song.release_year}`;
     released.classList.add('song-release');
-    songDiv.appendChild(released);
+    songRight.appendChild(released);
   }
 
   const mediaCount = document.createElement('p');
   mediaCount.textContent = 'Available media: ' + song.media_count;
   mediaCount.classList.add('song-media');
-  songDiv.appendChild(mediaCount);
+  songRight.appendChild(mediaCount);
 
   const buttonsDiv = document.createElement('div');
   buttonsDiv.classList.add('buttons');
-  songDiv.appendChild(buttonsDiv);
+  songRight.appendChild(buttonsDiv);
 
   const removeBtn = document.createElement('button');
   removeBtn.classList.add('remove-btn');
@@ -85,44 +97,79 @@ createSongDialog.addEventListener('click', ev => {
 /**
  * @type {HTMLDivElement}
  */
-const filesDiv = document.getElementById('files');
+const mediaFilesDiv = document.getElementById('media-files');
 
 /**
  * @type {File[]}
  */
-let files = [];
+let mediaFiles = [];
 
-function updateFiles() {
-  filesDiv.replaceChildren();
+function updateMediaFiles() {
+  mediaFilesDiv.replaceChildren();
 
-  for (const file of files) {
+  for (const file of mediaFiles) {
     const elem = document.createElement('div');
     elem.classList.add('file');
     elem.addEventListener('click', () => {
-      files = files.filter(f => f !== file);
-      updateFiles();
+      mediaFiles = mediaFiles.filter(f => f !== file);
+      updateMediaFiles();
     });
     const txt = document.createElement('p');
     txt.classList.add('file-text');
     txt.textContent = file.name;
     elem.appendChild(txt);
 
-    filesDiv.appendChild(elem);
+    mediaFilesDiv.appendChild(elem);
   }
+}
+
+/**
+ * @type {HTMLDivElement}
+ */
+const coverFilesDiv = document.getElementById('cover-files');
+
+/**
+ * @type {File | undefined}
+ */
+let coverFile;
+
+function updateCoverFile() {
+  coverFilesDiv.replaceChildren();
+  if (!coverFile) return;
+
+  const elem = document.createElement('div');
+  elem.classList.add('file');
+  elem.addEventListener('click', () => {
+    coverFile = undefined;
+    updateCoverFile();
+  });
+
+  const txt = document.createElement('p');
+  txt.classList.add('file-text');
+  txt.textContent = coverFile.name;
+  elem.appendChild(txt);
+
+  coverFilesDiv.appendChild(elem);
 }
 
 /**
  * @type {HTMLInputElement}
  */
-const uploadInput = document.getElementById('upload');
-uploadInput.addEventListener('change', async () => {
-  console.log(1);
-  for (const file of uploadInput.files) {
-    files.push(file);
+const uploadMediaInput = document.getElementById('upload');
+uploadMediaInput.addEventListener('change', async () => {
+  for (const file of uploadMediaInput.files) {
+    mediaFiles.push(file);
   }
 
-  updateFiles();
-  // const reader = new Int8Array(await uploadInput.files[0].arrayBuffer());
+  updateMediaFiles();
+});
+
+const uploadCoverInput = document.getElementById('upload-cover');
+uploadCoverInput.addEventListener('change', async () => {
+  if (uploadCoverInput.files.length === 0) return;
+  coverFile = uploadCoverInput.files[0];
+
+  updateCoverFile();
 });
 
 const titleInput = document.getElementById('title-input');
@@ -131,17 +178,35 @@ form.addEventListener('submit', async ev => {
   ev.preventDefault();
   ev.stopPropagation();
 
+  const title = titleInput.value;
+  if (!title) {
+    alert('Please enter a title');
+    return;
+  }
+
   // Create song
-  const songId = await API.createSong(titleInput.value);
-  console.log('Song id:', songId);
+  let songId;
+  try {
+    songId = await API.createSong(title);
+  } catch (err) {
+    alert(`Failed to create song: ${err.message}`);
+    return;
+  }
 
   // Upload files to new song
-  for (const file of files) {
-    console.log(`Uploading ${file.name}`);
+  for (const file of mediaFiles) {
     try {
       await API.uploadMedia(songId, file);
     } catch (err) {
       alert(`Failed to upload ${file.name}: ${err.message}`);
+    }
+  }
+
+  if (coverFile) {
+    try {
+      await API.uploadCover(songId, coverFile);
+    } catch (err) {
+      alert(`Failed to upload ${coverFile.name}: ${err.message}`);
     }
   }
 

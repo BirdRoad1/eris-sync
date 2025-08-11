@@ -8,10 +8,21 @@
   display: flex;
   height: 160px;
   flex-shrink: 0;
-  flex-direction: column;
+  /* flex-direction: column; */
   background-color: rgb(30, 30, 30);
   border-radius: 3px;
   padding: 15px;
+  gap: 10px;
+}
+
+.song-cover {
+  /* width: 100px; */
+  height: 128px;
+}
+
+.song-right {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -128,7 +139,8 @@
   width: 300px;
 }
 
-label[for='upload'] {
+.upload-label,
+.upload-cover-label {
   display: flex;
   justify-content: center;
   align-items: center;

@@ -34,9 +34,11 @@ CREATE TABLE IF NOT EXISTS song (
   genre TEXT,
   track_number INT CHECK (track_number > 0),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  artist_id INT,
   
   UNIQUE (album_id, track_number),
-  CONSTRAINT fk_song_album FOREIGN KEY(album_id) REFERENCES album(id) ON DELETE SET NULL
+  CONSTRAINT fk_song_album FOREIGN KEY(album_id) REFERENCES album(id) ON DELETE SET NULL,
+  CONSTRAINT fk_song_artist FOREIGN KEY(artist_id) REFERENCES artist(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS song_artist (

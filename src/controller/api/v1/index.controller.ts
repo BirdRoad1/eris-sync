@@ -23,6 +23,8 @@ const authenticate: RequestHandler = async (req, res, next) => {
   // Try user token
   const client = await Client.getByToken(token);
   if (client !== null) {
+    res.locals.token = token;
+    res.locals.client = client;
     return next();
   }
 
@@ -32,19 +34,32 @@ const authenticate: RequestHandler = async (req, res, next) => {
       algorithms: ['ES256']
     });
     if (typeof payload === 'object' && payload['role'] === 'admin') {
+      res.locals.token = token;
+      res.locals.admin = true;
       return next();
     }
-  } catch (err) {
-    console.log(
-      'Failed to validate JWT:',
-      err instanceof Error ? err.message : String(err)
-    );
+  } catch {
+    /* */
   }
 
   return res.status(401).json({ error: 'Unauthorized' });
 };
 
+const getMe: RequestHandler = async (req, res) => {
+  // TODO: maybe allow admin user?
+  if (!res.locals.client) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  res.json({
+    user: {
+      name: res.locals.client.name
+    }
+  });
+};
+
 export const apiController = Object.freeze({
   notFound,
-  authenticate
+  authenticate,
+  getMe
 });

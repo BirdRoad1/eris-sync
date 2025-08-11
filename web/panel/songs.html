@@ -37,9 +37,13 @@
                 <p>Title</p>
                 <input id="title-input" type="text" placeholder="Enter a song title" />
               </div>
-              <label for="upload">Upload Media</label>
+              <label for="upload" class="upload-label">Upload Media</label>
               <input type="file" id="upload" class="upload" />
-              <div class="files" id="files"></div>
+              <div class="files" id="media-files"></div>
+
+              <label for="upload-cover" class="upload-cover-label">Upload Cover</label>
+              <input type="file" id="upload-cover" class="upload" />
+              <div class="files" id="cover-files"></div>
               <button class="create-song-btn" type="submit">Create</button>
             </form>
           </div>

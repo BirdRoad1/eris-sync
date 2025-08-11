@@ -12,7 +12,7 @@ function generateToken() {
 }
 
 const getClients: express.RequestHandler = async (req, res) => {
-  res.json({ result: await Client.getAll() });
+  res.json({ results: await Client.getAll() });
 };
 
 const createClient: express.RequestHandler = async (req, res) => {

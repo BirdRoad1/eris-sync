@@ -3,6 +3,7 @@ import z from 'zod';
 import fs from 'fs';
 
 export const envSchema = z.object({
+  BASE_URL: z.string(),
   PORT: z
     .string()
     .default('8000')
