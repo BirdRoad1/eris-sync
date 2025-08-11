@@ -19,11 +19,13 @@ const getSongs: RequestHandler = async (req, res) => {
 const postSongs: RequestHandler = async (req, res) => {
   const parsed = CreateSongSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: 'Malformed request' });
+    res.status(400).json({ error: parsed.error.issues[0].message });
     return;
   }
 
-  const id = await Song.create(parsed.data.title);
+  const { title, artistId } = parsed.data;
+
+  const id = await Song.create(title, artistId);
   res.json({ id });
 };
 
@@ -150,7 +152,7 @@ const postCover: RequestHandler = async (req, res) => {
     return res.status(400).json({ error: 'No content-length' });
   }
 
-  // 100 MB
+  // 10 MB
   const maxSize = 10 * 1e6;
 
   if (contentLength > maxSize) {

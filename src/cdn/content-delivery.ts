@@ -96,13 +96,20 @@ export class ContentDelivery {
 
     const dir = path.join(env.STORAGE_PATH, uuid);
     const files = await fs.readdir(dir);
-    if (files.length !== 1) {
-      throw new Error('Directory has incorrect amount of files: ' + dir);
-    }
-
     if (!this.secureTestPath(dir))
       throw new Error('Tried to delete external file:' + dir);
-    await fs.rm(path.join(dir, files[0]));
+
+    if (files.length > 1) {
+      throw new Error(
+        'Directory has incorrect amount of files: ' +
+          dir +
+          ', count: ' +
+          files.length
+      );
+    } else if (files.length === 1) {
+      await fs.rm(path.join(dir, files[0]));
+    }
+
     await fs.rmdir(dir);
   }
 
@@ -119,7 +126,8 @@ export class ContentDelivery {
 
     // TODO: make this path configurable
     return (
-      env.BASE_URL + '/api/v1/storage/' +
+      env.BASE_URL +
+      '/api/v1/storage/' +
       path
         .relative(path.resolve(env.STORAGE_PATH), absPath)
         .replace(/^[.]*/g, '')

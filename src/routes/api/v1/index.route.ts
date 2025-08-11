@@ -4,6 +4,8 @@ import { apiController } from '../../../controller/api/v1/index.controller';
 import { songsRouter } from './songs.route';
 import { env } from '../../../env/env';
 import fs from 'fs';
+import { artistsRouter } from './artists.route';
+import { albumsRouter } from './albums.route';
 
 export const apiRouterV1 = express.Router();
 function getVersion() {
@@ -31,6 +33,10 @@ apiRouterV1.use(apiController.authenticate);
 apiRouterV1.use('/me', apiController.getMe);
 
 apiRouterV1.use('/songs', songsRouter);
+
+apiRouterV1.use('/artists', artistsRouter);
+
+apiRouterV1.use('/albums', albumsRouter);
 
 apiRouterV1.use('/storage', express.static(env.STORAGE_PATH));
 
