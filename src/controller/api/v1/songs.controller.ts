@@ -57,7 +57,7 @@ const getMedia: RequestHandler = async (req, res) => {
     return;
   }
 
-  const media = await SongMedia.findBySong(song.id);
+  const media = await SongMedia.publicFindBySong(song.id);
 
   return res.json({ results: media });
 };
