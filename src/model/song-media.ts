@@ -3,7 +3,7 @@ import { db } from '../db/db';
 import { queries } from '../db/queries';
 
 export class SongMedia {
-  private static transform(media: any) {
+  static transform(media: any) {
     media = { ...media };
 
     const file_path: string | null = media.file_path;

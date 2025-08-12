@@ -6,3 +6,4 @@ playlistsRouter.get('/', playlistsController.getPlaylists);
 playlistsRouter.post('/', express.json(), playlistsController.createPlaylist);
 playlistsRouter.post('/:id/song', express.json(), playlistsController.postSong);
 playlistsRouter.delete('/:id', playlistsController.deletePlaylist);
+playlistsRouter.delete('/:id/song', express.json(), playlistsController.deleteSong);

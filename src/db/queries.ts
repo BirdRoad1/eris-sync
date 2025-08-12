@@ -103,7 +103,7 @@ export const queries = {
 
   INSERT_PLAYLIST: 'INSERT INTO playlist (name) VALUES ($1);',
   DELETE_PLAYLIST: 'DELETE FROM playlist WHERE id=$1;',
-  SELECT_ALL_PLAYLISTS: `SELECT p.id, p.name, s.id as song_id, s.title as song_title
+  SELECT_ALL_PLAYLISTS: `SELECT p.id, p.name, s.id as song_id, s.title as song_title, s.cover_path as song_cover_path
   FROM playlist p
   LEFT JOIN
     song_playlist as sp
@@ -112,5 +112,6 @@ export const queries = {
     song as s
     ON s.id = sp.song_id;`,
   ADD_SONG_TO_PLAYLIST:
-    'INSERT INTO song_playlist (song_id, playlist_id) VALUES ($1, $2);'
+    'INSERT INTO song_playlist (song_id, playlist_id) VALUES ($1, $2);',
+    REMOVE_SONG_FROM_PLAYLIST: 'DELETE FROM song_playlist WHERE song_id=$1 AND playlist_id=$2'
 };

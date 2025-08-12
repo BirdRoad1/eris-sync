@@ -62,9 +62,32 @@ const postSong: RequestHandler = async (req, res) => {
   res.json({});
 };
 
+const deleteSong: RequestHandler = async (req, res) => {
+  const paramsParsed = clientQuerySchema.safeParse(req.params); // TODO: rename schema for better reuse
+
+  if (!paramsParsed.success) {
+    res.status(400).json({ error: 'Invalid id' });
+    return;
+  }
+
+  const parsed = addSongToPlaylistSchema.safeParse(req.body); // TODO: rename schema for better reuse
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const playlistId = paramsParsed.data.id;
+  const songId = parsed.data?.id;
+
+  await Playlist.removeSongFromPlaylist(songId, playlistId);
+
+  res.json({});
+};
+
 export const playlistsController = {
   getPlaylists,
   createPlaylist,
   deletePlaylist,
-  postSong
+  postSong,
+  deleteSong
 };
