@@ -6,6 +6,7 @@ import { env } from '../../../env/env';
 import fs from 'fs';
 import { artistsRouter } from './artists.route';
 import { albumsRouter } from './albums.route';
+import { playlistsRouter } from './playlists.route';
 
 export const apiRouterV1 = express.Router();
 function getVersion() {
@@ -25,7 +26,6 @@ apiRouterV1.get('/', (req, res) => {
   });
 });
 
-
 apiRouterV1.use('/admin', adminRouter);
 
 apiRouterV1.use(apiController.authenticate);
@@ -37,6 +37,8 @@ apiRouterV1.use('/songs', songsRouter);
 apiRouterV1.use('/artists', artistsRouter);
 
 apiRouterV1.use('/albums', albumsRouter);
+
+apiRouterV1.use('/playlists', playlistsRouter);
 
 apiRouterV1.use('/storage', express.static(env.STORAGE_PATH));
 

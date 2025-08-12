@@ -60,6 +60,21 @@ CREATE TABLE IF NOT EXISTS song_media (
   CONSTRAINT fk_song_media_song FOREIGN KEY(song_id) REFERENCES song(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS playlist (
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS song_playlist (
+  song_id INT NOT NULL,
+  playlist_id INT NOT NULL,
+
+  PRIMARY KEY (song_id, playlist_id),
+  CONSTRAINT fk_song_playlist_song FOREIGN KEY(song_id) REFERENCES song(id) ON DELETE CASCADE,
+  CONSTRAINT fk_song_playlist_playlist FOREIGN KEY(playlist_id) REFERENCES playlist(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_album_artist_album_id ON album_artist(album_id);
 CREATE INDEX IF NOT EXISTS idx_album_artist_artist_id ON album_artist(artist_id);
 CREATE INDEX IF NOT EXISTS idx_song_album_id ON song(album_id);

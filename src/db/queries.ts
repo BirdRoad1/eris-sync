@@ -17,7 +17,7 @@ export const queries = {
   INSERT_SONG:
     'INSERT INTO song (title, artist_id, album_id, cover_path, release_year, duration_seconds, lyrics_url, genre, track_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
   DELETE_SONG: 'DELETE FROM song WHERE id=$1 RETURNING id',
-  SELECT_ALL_SONGS: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number, COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_path, artist.name as artist_name
+  SELECT_ALL_SONGS: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number, COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_path, artist.name as artist_name, artist.id as artist_id
         FROM song s
         LEFT JOIN 
           (
@@ -70,7 +70,7 @@ export const queries = {
   UPDATE_ARTIST_COVER: 'UPDATE artist SET cover_path=$2 WHERE id=$1',
   DELETE_ARTIST: 'DELETE FROM artist WHERE id=$1 RETURNING id',
   SEARCH_ARTIST: `SELECT * FROM artist WHERE name LIKE '%' || $1 || '%'`,
-  SELECT_ALL_ALBUMS: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name
+  SELECT_ALL_ALBUMS: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name, ar.id as artist_id
   FROM album a
   LEFT JOIN 
     (
@@ -83,7 +83,7 @@ export const queries = {
     ON aa.album_id = a.id
   LEFT JOIN artist AS ar
     ON ar.id = aa.artist_id;`,
-  SELECT_ALBUM_BY_ID: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name
+  SELECT_ALBUM_BY_ID: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name, ar.id as artist_id
   FROM album a
   LEFT JOIN 
     (
@@ -99,5 +99,18 @@ export const queries = {
   WHERE a.id=$1;`,
   SEARCH_ALBUM: `SELECT * FROM album WHERE name LIKE '%' || $1 || '%'`,
   DELETE_ALBUM: 'DELETE FROM album WHERE id=$1 RETURNING id',
-  UPDATE_ALBUM_COVER: 'UPDATE album SET cover_path=$2 WHERE id=$1'
+  UPDATE_ALBUM_COVER: 'UPDATE album SET cover_path=$2 WHERE id=$1',
+
+  INSERT_PLAYLIST: 'INSERT INTO playlist (name) VALUES ($1);',
+  DELETE_PLAYLIST: 'DELETE FROM playlist WHERE id=$1;',
+  SELECT_ALL_PLAYLISTS: `SELECT p.id, p.name, s.id as song_id, s.title as song_title
+  FROM playlist p
+  LEFT JOIN
+    song_playlist as sp
+    ON sp.playlist_id = p.id
+  LEFT JOIN
+    song as s
+    ON s.id = sp.song_id;`,
+  ADD_SONG_TO_PLAYLIST:
+    'INSERT INTO song_playlist (song_id, playlist_id) VALUES ($1, $2);'
 };
