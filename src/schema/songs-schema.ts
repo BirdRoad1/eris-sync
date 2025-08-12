@@ -2,5 +2,6 @@ import z from 'zod';
 
 export const CreateSongSchema = z.object({
   title: z.string().nonempty(),
-  artistId: z.number().optional()
+  artistId: z.number().optional(),
+  albumId: z.number().optional()
 });

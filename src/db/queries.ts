@@ -12,9 +12,10 @@ export const queries = {
   SELECT_SONG_MEDIA_BY_SONG:
     'SELECT id,mime_type,file_path FROM song_media WHERE song_id=$1',
   INSERT_ALBUM:
-    'INSERT INTO album (name, cover_path, genre, release_year) VALUES ($1, $2, $3, $4)',
+    'INSERT INTO album (name, cover_path, genre, release_year) VALUES ($1, $2, $3, $4) RETURNING id',
+  CONNECT_ALBUM_TO_ARTIST: `INSERT INTO album_artist (album_id, artist_id) VALUES ($1, $2)`,
   INSERT_SONG:
-    'INSERT INTO song (title, artist_id, cover_path, release_year, duration_seconds, lyrics_url, genre, track_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+    'INSERT INTO song (title, artist_id, album_id, cover_path, release_year, duration_seconds, lyrics_url, genre, track_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
   DELETE_SONG: 'DELETE FROM song WHERE id=$1 RETURNING id',
   SELECT_ALL_SONGS: `SELECT s.id,s.title,s.album_id,s.cover_path,s.release_year,s.duration_seconds,s.lyrics_url,s.genre,s.track_number, COALESCE(CAST(m.media_count AS INTEGER), 0) as media_count, a.name as album_name, a.cover_path as album_cover_path, artist.name as artist_name
         FROM song s
@@ -68,5 +69,35 @@ export const queries = {
   WHERE id=$1`,
   UPDATE_ARTIST_COVER: 'UPDATE artist SET cover_path=$2 WHERE id=$1',
   DELETE_ARTIST: 'DELETE FROM artist WHERE id=$1 RETURNING id',
-  SEARCH_ARTIST: `SELECT * FROM artist WHERE name LIKE '%' || $1 || '%'`
+  SEARCH_ARTIST: `SELECT * FROM artist WHERE name LIKE '%' || $1 || '%'`,
+  SELECT_ALL_ALBUMS: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name
+  FROM album a
+  LEFT JOIN 
+    (
+      SELECT album_id,COUNT(*) as song_count
+      FROM song
+      GROUP BY album_id
+    ) s
+    ON s.album_id = a.id
+  LEFT JOIN album_artist AS aa
+    ON aa.album_id = a.id
+  LEFT JOIN artist AS ar
+    ON ar.id = aa.artist_id;`,
+  SELECT_ALBUM_BY_ID: `SELECT a.id,a.name,a.cover_path,a.genre,a.release_year,COALESCE(CAST(s.song_count AS INTEGER), 0) as song_count, ar.name as artist_name
+  FROM album a
+  LEFT JOIN 
+    (
+      SELECT album_id,COUNT(*) as song_count
+      FROM song
+      GROUP BY album_id
+    ) s
+    ON s.album_id = a.id
+  LEFT JOIN album_artist AS aa
+    ON aa.album_id = a.id
+  LEFT JOIN artist AS ar
+    ON ar.id = aa.artist_id
+  WHERE a.id=$1;`,
+  SEARCH_ALBUM: `SELECT * FROM album WHERE name LIKE '%' || $1 || '%'`,
+  DELETE_ALBUM: 'DELETE FROM album WHERE id=$1 RETURNING id',
+  UPDATE_ALBUM_COVER: 'UPDATE album SET cover_path=$2 WHERE id=$1'
 };

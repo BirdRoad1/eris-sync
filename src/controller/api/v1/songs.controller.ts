@@ -23,9 +23,9 @@ const postSongs: RequestHandler = async (req, res) => {
     return;
   }
 
-  const { title, artistId } = parsed.data;
+  const { title, artistId, albumId } = parsed.data;
 
-  const id = await Song.create(title, artistId);
+  const id = await Song.create(title, artistId, albumId);
   res.json({ id });
 };
 

@@ -20,17 +20,19 @@ export class Song {
   static async create(
     title: string,
     artist_id?: number,
+    album_id?: number,
     cover_path?: string,
     release_year?: string,
     duration_seconds?: string,
     lyrics_url?: string,
     genre?: string,
-    track_number?: string,
+    track_number?: string
   ): Promise<number> {
     return (
       await db.query(queries.INSERT_SONG, [
         title,
         artist_id ?? null,
+        album_id ?? null,
         cover_path ?? null,
         release_year ?? null,
         duration_seconds ?? null,
