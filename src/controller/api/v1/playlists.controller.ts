@@ -5,6 +5,7 @@ import {
   createPlaylistSchema
 } from '../../../schema/playlist-schema';
 import { clientQuerySchema } from '../../../schema/admin-schema';
+import { RequestHandlerWithBody } from '../../../middleware/validation.middlware';
 
 const getPlaylists: RequestHandler = async (req, res) => {
   res.json({
@@ -12,15 +13,9 @@ const getPlaylists: RequestHandler = async (req, res) => {
   });
 };
 
-const createPlaylist: RequestHandler = async (req, res) => {
-  const parsed = createPlaylistSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0].message });
-    return;
-  }
-
+const createPlaylist: RequestHandlerWithBody<typeof createPlaylistSchema> = async (req, res) => {
   res.json({
-    id: await Playlist.create(parsed.data.name)
+    id: await Playlist.create(req.body.name)
   });
 };
 

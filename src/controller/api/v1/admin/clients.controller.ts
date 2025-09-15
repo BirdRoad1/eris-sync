@@ -1,29 +1,26 @@
-import express from 'express';
+import { RequestHandler } from 'express';
 import {
   clientQuerySchema,
   createClientSchema
 } from '../../../../schema/admin-schema';
 import { Client } from '../../../../model/client';
 import crypto from 'crypto';
+import { RequestHandlerWithBody } from '../../../../middleware/validation.middlware';
 
 // 256-bit
 function generateToken() {
   return crypto.randomBytes(256 / 8).toString('hex');
 }
 
-const getClients: express.RequestHandler = async (req, res) => {
+const getClients: RequestHandler = async (req, res) => {
   res.json({ results: await Client.getAll() });
 };
 
-const createClient: express.RequestHandler = async (req, res) => {
-  const parsed = createClientSchema.safeParse(req.body);
-
-  if (!parsed.success) {
-    res.status(400).json({ error: 'Invalid payload' });
-    return;
-  }
-
-  const { name } = parsed.data;
+const createClient: RequestHandlerWithBody<typeof createClientSchema> = async (
+  req,
+  res
+) => {
+  const { name } = req.body;
 
   const privateToken = generateToken();
 
@@ -32,7 +29,7 @@ const createClient: express.RequestHandler = async (req, res) => {
   res.json({});
 };
 
-const deleteClient: express.RequestHandler = async (req, res) => {
+const deleteClient: RequestHandler = async (req, res) => {
   const parsed = clientQuerySchema.safeParse(req.params);
 
   if (!parsed.success) {
@@ -48,7 +45,7 @@ const deleteClient: express.RequestHandler = async (req, res) => {
   }
 };
 
-const getToken: express.RequestHandler = async (req, res) => {
+const getToken: RequestHandler = async (req, res) => {
   const parsed = clientQuerySchema.safeParse(req.params);
   if (!parsed.success) {
     res.status(400).json({ error: 'Invalid id' });
@@ -64,7 +61,7 @@ const getToken: express.RequestHandler = async (req, res) => {
   res.json({ token });
 };
 
-const resetToken: express.RequestHandler = async (req, res) => {
+const resetToken: RequestHandler = async (req, res) => {
   const parsed = clientQuerySchema.safeParse(req.params);
   if (!parsed.success) {
     res.status(400).json({ error: 'Invalid id' });

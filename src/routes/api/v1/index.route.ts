@@ -7,6 +7,7 @@ import fs from 'fs';
 import { artistsRouter } from './artists.route';
 import { albumsRouter } from './albums.route';
 import { playlistsRouter } from './playlists.route';
+import { authenticate } from '../../../middleware/auth.middleware';
 
 export const apiRouterV1 = express.Router();
 function getVersion() {
@@ -28,7 +29,7 @@ apiRouterV1.get('/', (req, res) => {
 
 apiRouterV1.use('/admin', adminRouter);
 
-apiRouterV1.use(apiController.authenticate);
+apiRouterV1.use(authenticate());
 
 apiRouterV1.use('/me', apiController.getMe);
 

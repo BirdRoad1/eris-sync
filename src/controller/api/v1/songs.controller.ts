@@ -9,6 +9,7 @@ import {
 import { ContentDelivery } from '../../../cdn/content-delivery';
 import { SongMedia } from '../../../model/song-media';
 import { clientQuerySchema } from '../../../schema/admin-schema';
+import { RequestHandlerWithBody } from '../../../middleware/validation.middlware';
 
 const getSongs: RequestHandler = async (req, res) => {
   res.json({
@@ -16,14 +17,11 @@ const getSongs: RequestHandler = async (req, res) => {
   });
 };
 
-const postSongs: RequestHandler = async (req, res) => {
-  const parsed = CreateSongSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0].message });
-    return;
-  }
-
-  const { title, artistId, albumId } = parsed.data;
+const postSongs: RequestHandlerWithBody<typeof CreateSongSchema> = async (
+  req,
+  res
+) => {
+  const { title, artistId, albumId } = req.body;
 
   const id = await Song.create(title, artistId, albumId);
   res.json({ id });

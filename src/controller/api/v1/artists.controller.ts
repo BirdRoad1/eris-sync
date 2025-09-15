@@ -11,23 +11,17 @@ import {
   StreamByteLimitTransform
 } from '../../../streams/stream-byte-limit-transform';
 import { pipeline } from 'stream/promises';
+import { RequestHandlerWithBody } from '../../../middleware/validation.middlware';
 
 const getArtists: RequestHandler = async (req, res) => {
-  console.log(await Artist.getAll());
   res.json({
     results: await Artist.getAll()
   });
 };
 
-const createArtist: RequestHandler = async (req, res) => {
-  const parsed = createArtistSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0].message });
-    return;
-  }
-
+const createArtist: RequestHandlerWithBody<typeof createArtistSchema> = async (req, res) => {
   res.json({
-    id: await Artist.create(parsed.data.name)
+    id: await Artist.create(req.body.name)
   });
 };
 
@@ -109,13 +103,8 @@ const postCover: RequestHandler = async (req, res) => {
   }
 };
 
-const search: RequestHandler = async (req, res) => {
-  const parsed = searchArtistSchema.safeParse(req.query);
-  if (!parsed.success) {
-    return res.status(400).json({ error: 'Missing name' });
-  }
-
-  const { name } = parsed.data;
+const search: RequestHandlerWithBody<typeof searchArtistSchema> = async (req, res) => {
+  const { name } = req.body;
 
   res.json({ results: await Artist.search(name) });
 };

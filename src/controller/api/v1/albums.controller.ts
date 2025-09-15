@@ -11,6 +11,7 @@ import {
   StreamByteLimitExceededError,
   StreamByteLimitTransform
 } from '../../../streams/stream-byte-limit-transform';
+import { RequestHandlerWithBody } from '../../../middleware/validation.middlware';
 
 const getAll: RequestHandler = async (req, res) => {
   const albums = await Album.getAll();
@@ -18,13 +19,8 @@ const getAll: RequestHandler = async (req, res) => {
   res.json({ results: albums });
 };
 
-const postAlbum: RequestHandler = async (req, res) => {
-  const parsed = createAlbumSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0].message });
-  }
-
-  const { name, genre, release_year, artistIds: artist_id } = parsed.data;
+const postAlbum: RequestHandlerWithBody<typeof createAlbumSchema> = async (req, res) => {
+  const { name, genre, release_year, artistIds: artist_id } = req.body;
 
   const id = await Album.create(
     name,
@@ -114,13 +110,8 @@ const postCover: RequestHandler = async (req, res) => {
   }
 };
 
-const search: RequestHandler = async (req, res) => {
-  const parsed = searchAlbumSchema.safeParse(req.query);
-  if (!parsed.success) {
-    return res.status(400).json({ error: 'Missing name' });
-  }
-
-  const { name } = parsed.data;
+const search: RequestHandlerWithBody<typeof searchAlbumSchema> = async (req, res) => {
+  const { name } = req.body;
 
   res.json({ results: await Album.search(name) });
 };

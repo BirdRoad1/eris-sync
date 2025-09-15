@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
 import { env } from '../../../../env/env';
 import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
+import jwt from '../../../../lib/jwt';
 
-const authenticate: RequestHandler = async (req, res) => {
+const login: RequestHandler = async (req, res) => {
   const authorization = req.get('Authorization');
   if (authorization === undefined || !authorization.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -24,10 +24,8 @@ const authenticate: RequestHandler = async (req, res) => {
     {
       role: 'admin'
     },
-    env.JWT_ECDSA_PRIVATE_KEY,
     {
-      expiresIn: '1 day',
-      algorithm: 'ES256'
+      expiresIn: '1 day'
     }
   );
 
@@ -36,29 +34,6 @@ const authenticate: RequestHandler = async (req, res) => {
   });
 };
 
-const validateAuth: RequestHandler = (req, res, next) => {
-  const authorization = req.get('Authorization');
-  if (authorization === undefined || !authorization.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  const token = authorization.substring(7);
-  const data = jwt.verify(token, env.JWT_ECDSA_PUBLIC_KEY, {
-    algorithms: ['ES256']
-  });
-  if (typeof data === 'object' && data['role'] === 'admin') {
-    next();
-  } else {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-};
-
-const getRoot: RequestHandler = async (req, res) => {
-  res.json({});
-};
-
 export const adminController = {
-  authenticate,
-  validateAuth,
-  getRoot
+  login
 };
